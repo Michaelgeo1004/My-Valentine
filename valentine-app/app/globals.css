@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+@theme {
+  --color-romantic-red: hsl(350, 89%, 60%);
+  --color-romantic-pink: hsl(330, 85%, 70%);
+  --color-romantic-gold: hsl(45, 100%, 70%);
+
+  --color-glass-bg: hsla(0, 0%, 100%, 0.1);
+  --color-glass-border: hsla(0, 0%, 100%, 0.2);
+
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-tamil: 'Noto Sans Tamil', sans-serif;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-rainbow: rainbow 8s linear infinite;
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes pulse-slow {
+
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.6;
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0% 50%;
+    }
+
+    50% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+}
+
+:root {
+  --background: 350 100% 99%;
+  --foreground: 350 40% 10%;
+
+  --primary: 350 89% 60%;
+  --primary-foreground: 0 0% 100%;
+  --primary-rgb: 255, 77, 77;
+
+  --glass-bg: hsla(0, 0%, 100%, 0.3);
+  --glass-border: hsla(0, 0%, 100%, 0.2);
+  --vibrant-red: 350 89% 60%;
+}
+
+.dark {
+  --background: 350 40% 5%;
+  --foreground: 350 20% 98%;
+
+  --primary: 350 89% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  --glass-bg: hsla(350, 40%, 10%, 0.5);
+  --glass-border: hsla(350, 40%, 20%, 0.3);
+}
+
+.rainbow {
+  --background: 280 100% 98%;
+  --foreground: 280 80% 10%;
+
+  --primary: 280 89% 45%;
+  /* Slightly darker for better visibility on rainbow bg */
+  --primary-foreground: 0 0% 100%;
+  --primary-rgb: 153, 69, 219;
+
+  --glass-bg: hsla(0, 0%, 100%, 0.7);
+  --glass-border: hsla(280, 89%, 60%, 0.4);
+}
+
+* {
+  border-color: var(--glass-border);
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-inter);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Premium Animated Mesh Gradient Background */
+.mesh-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(at 0% 0%, hsla(350, 89%, 60%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(330, 85%, 70%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, hsla(45, 100%, 70%, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, hsla(350, 89%, 60%, 0.1) 0px, transparent 50%);
+  filter: blur(100px);
+  animation: mesh-move 20s ease infinite;
+}
+
+.rainbow .mesh-gradient {
+  background-image: linear-gradient(-45deg,
+      #ffadad, #ffd6a5, #fdffb6, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff, #ffc6ff);
+  background-size: 400% 400%;
+  animation: rainbow 10s ease infinite;
+  filter: blur(50px);
+  opacity: 0.6;
+}
+
+@keyframes mesh-move {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(255, 77, 77, 0.15);
+}
+
+.text-romantic {
+  background: linear-gradient(135deg, hsl(350, 89%, 60%), hsl(330, 85%, 70%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+.bg-primary {
+  background-color: hsl(var(--primary));
+}
+
+.text-primary-foreground {
+  color: hsl(var(--primary-foreground));
+}
+
+.heart-pulse {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
