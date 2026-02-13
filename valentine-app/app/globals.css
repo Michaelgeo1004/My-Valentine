@@ -10,6 +10,8 @@
 
   --font-inter: 'Inter', system-ui, sans-serif;
   --font-tamil: 'Noto Sans Tamil', sans-serif;
+  --font-script: var(--font-great-vibes), cursive;
+  --font-cinzel: var(--font-cinzel), serif;
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
@@ -78,6 +80,12 @@
   --glass-bg: hsla(0, 0%, 100%, 0.3);
   --glass-border: hsla(0, 0%, 100%, 0.2);
   --vibrant-red: 350 89% 60%;
+
+  --romantic-gradient-start: hsl(350, 89%, 50%);
+  /* Darker for light mode */
+  --romantic-gradient-end: hsl(330, 85%, 60%);
+  --cube-shadow: rgba(255, 77, 77, 0.1);
+  --face-border: hsla(0, 0%, 0%, 0.1);
 }
 
 .dark {
@@ -89,6 +97,11 @@
 
   --glass-bg: hsla(350, 40%, 10%, 0.5);
   --glass-border: hsla(350, 40%, 20%, 0.3);
+
+  --romantic-gradient-start: hsl(350, 89%, 60%);
+  --romantic-gradient-end: hsl(330, 85%, 70%);
+  --cube-shadow: rgba(0, 0, 0, 0.4);
+  --face-border: hsla(0, 0%, 100%, 0.2);
 }
 
 .rainbow {
@@ -102,6 +115,11 @@
 
   --glass-bg: hsla(0, 0%, 100%, 0.7);
   --glass-border: hsla(280, 89%, 60%, 0.4);
+
+  --romantic-gradient-start: hsl(280, 89%, 40%);
+  --romantic-gradient-end: hsl(330, 85%, 50%);
+  --cube-shadow: rgba(153, 69, 219, 0.2);
+  --face-border: hsla(280, 89%, 20%, 0.2);
 }
 
 * {
@@ -160,11 +178,50 @@ body {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(255, 77, 77, 0.15);
+  box-shadow: 0 8px 32px 0 var(--cube-shadow);
+}
+
+.cube-face {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(200%);
+  -webkit-backdrop-filter: blur(20px) saturate(200%);
+  border: 1.5px solid var(--face-border);
+  box-shadow:
+    inset 0 0 40px var(--face-border),
+    inset 0 0 20px hsla(0, 0%, 100%, 0.15),
+    0 10px 40px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+
+.cube-face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 45%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0.1) 55%,
+      transparent 100%);
+  background-size: 250% 250%;
+  animation: shimmer 6s infinite;
+  pointer-events: none;
+}
+
+.rainbow .cube-face {
+  background: hsla(0, 0%, 100%, 0.4);
+  border-color: hsla(0, 0%, 100%, 0.6);
+  box-shadow:
+    inset 0 0 20px hsla(0, 0%, 100%, 0.3),
+    0 0 20px rgba(0, 0, 0, 0.05);
 }
 
 .text-romantic {
-  background: linear-gradient(135deg, hsl(350, 89%, 60%), hsl(330, 85%, 70%));
+  background: linear-gradient(135deg, var(--romantic-gradient-start), var(--romantic-gradient-end));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -185,4 +242,17 @@ body {
 
 .heart-pulse {
   animation: pulse-slow 2s ease-in-out infinite;
+}
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
 }

@@ -9,8 +9,6 @@ import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
 
-const START_DATE = new RegExp("2021-01-22T00:00:00"); // Standardized start
-
 export default function TickerPage() {
     const { lang } = useAppContext();
     const router = useRouter();
@@ -95,6 +93,23 @@ export default function TickerPage() {
                     ))}
                 </div>
 
+                {/* Life Milestones */}
+                <div className="mb-12">
+                    <h3 className="text-sm font-black uppercase tracking-[0.2em] opacity-40 mb-6 text-center">Milestones of Us</h3>
+                    <div className="space-y-4">
+                        {[
+                            { label: "Days since our first kiss", val: Math.floor((new Date().getTime() - new Date("2021-03-25").getTime()) / (1000 * 60 * 60 * 24)) },
+                            { label: "Dreams shared in distance", val: "∞" },
+                            { label: "Miles traveled in thoughts", val: "2,845,000+" }
+                        ].map((m, i) => (
+                            <div key={i} className="flex justify-between items-center p-4 glass-card rounded-2xl border-white/5">
+                                <span className="text-[10px] md:text-sm font-bold opacity-60 truncate">{m.label}</span>
+                                <span className="text-romantic font-black">{m.val}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="w-full">
                     <motion.div
                         animate={{ scale: [1, 1.05, 1], rotate: [0, 1, 0] }}
@@ -103,16 +118,16 @@ export default function TickerPage() {
                     >
                         <Heart className="text-romantic-red fill-current" />
                         <p className="text-sm md:text-lg font-black italic text-romantic">
-                            "Our time is just beginning."
+                            "Every second is a treasure."
                         </p>
                     </motion.div>
 
                     <motion.button
                         whileHover={{ scale: 1.05 }}
-                        onClick={() => router.push("/story/oracle")}
+                        onClick={() => router.push("/story/letters")}
                         className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
                     >
-                        <span>{content[lang].cta_ticker}</span>
+                        <span>{content[lang].cta_letters}</span>
                         <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
                     </motion.button>
                 </div>

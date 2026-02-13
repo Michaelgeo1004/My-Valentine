@@ -7,10 +7,16 @@ import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
+import { useEffect } from "react";
+import { logInsight } from "@/utils/insights";
 
 export default function StarMapPage() {
     const { lang } = useAppContext();
     const router = useRouter();
+
+    useEffect(() => {
+        logInsight('lastPage', 'Star Map');
+    }, []);
 
     const constellations = [
         { x: "20", y: "30", size: 8 },
@@ -32,61 +38,87 @@ export default function StarMapPage() {
                 </p>
 
                 {/* Constellation Visualization */}
-                <div className="relative w-full aspect-[2/1] bg-black/40 rounded-[3rem] border border-white/10 shadow-2xl mb-12 overflow-hidden flex divide-x divide-white/5">
-                    {/* Dubai Sky */}
-                    <div className="flex-1 relative">
-                        <div className="absolute top-4 left-6 flex items-center gap-2 opacity-50">
-                            <MapPin size={12} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">{content[lang].dubai}</span>
+                <div className="relative w-full aspect-[16/9] md:aspect-[2/1] bg-[#02040a] rounded-[3rem] border border-white/10 shadow-2xl mb-12 overflow-hidden">
+                    {/* Parallax Starfield Background */}
+                    <div className="absolute inset-0 z-0">
+                        {Array.from({ length: 50 }).map((_, i) => (
+                            <motion.div
+                                key={`bg-star-${i}`}
+                                animate={{ opacity: [0.1, 0.4, 0.1] }}
+                                transition={{ repeat: Infinity, duration: 3 + Math.random() * 5, delay: Math.random() * 5 }}
+                                className="absolute w-px h-px bg-white rounded-full"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    <div className="relative w-full h-full flex divide-x divide-white/5 z-10">
+                        {/* Dubai Sky */}
+                        <div className="flex-1 relative">
+                            <div className="absolute top-4 left-6 flex items-center gap-2 opacity-30 z-20">
+                                <MapPin size={12} className="text-romantic-red" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">{content[lang].dubai}</span>
+                            </div>
+
+                            {constellations.map((s, i) => (
+                                <motion.div
+                                    key={`dubai-star-${i}`}
+                                    animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.2, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 + Math.random() * 2, delay: i * 0.2 }}
+                                    className="absolute text-white"
+                                    style={{ left: `${s.x}%`, top: `${s.y}%` }}
+                                >
+                                    <Star size={s.size} fill="currentColor" className="drop-shadow-[0_0_5px_white]" />
+                                </motion.div>
+                            ))}
                         </div>
 
-                        {constellations.map((s, i) => (
-                            <motion.div
-                                key={i}
-                                animate={{ opacity: [0.4, 1, 0.4] }}
-                                transition={{ repeat: Infinity, duration: 2 + Math.random() * 3, delay: i * 0.5 }}
-                                className="absolute text-white"
-                                style={{ left: `${s.x}%`, top: `${s.y}%` }}
-                            >
-                                <Star size={s.size} fill="currentColor" />
-                            </motion.div>
-                        ))}
+                        {/* India Sky */}
+                        <div className="flex-1 relative">
+                            <div className="absolute top-4 right-6 flex items-center gap-2 opacity-30 justify-end z-20">
+                                <span className="text-[10px] font-black uppercase tracking-widest">{content[lang].tirunelveli}</span>
+                                <MapPin size={12} className="text-romantic-pink" />
+                            </div>
 
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-32 h-32 rounded-full bg-romantic-red/10 blur-[60px]" />
+                            {constellations.map((s, i) => (
+                                <motion.div
+                                    key={`india-star-${i}`}
+                                    animate={{ opacity: [0.4, 1, 0.4], scale: [1, 1.2, 1] }}
+                                    transition={{ repeat: Infinity, duration: 2 + Math.random() * 3, delay: i * 0.4 }}
+                                    className="absolute text-white"
+                                    style={{ right: `${s.x}%`, bottom: `${s.y}%` }}
+                                >
+                                    <Star size={s.size} fill="currentColor" className="drop-shadow-[0_0_5px_white]" />
+                                </motion.div>
+                            ))}
                         </div>
                     </div>
 
-                    {/* Tirunelveli Sky */}
-                    <div className="flex-1 relative">
-                        <div className="absolute top-4 right-6 flex items-center gap-2 opacity-50 justify-end">
-                            <span className="text-[10px] font-black uppercase tracking-widest">{content[lang].tirunelveli}</span>
-                            <MapPin size={12} />
-                        </div>
-
-                        {constellations.map((s, i) => (
-                            <motion.div
-                                key={i}
-                                animate={{ opacity: [0.4, 1, 0.4] }}
-                                transition={{ repeat: Infinity, duration: 2 + Math.random() * 3, delay: i * 0.3 }}
-                                className="absolute text-white"
-                                style={{ right: `${s.x}%`, bottom: `${s.y}%` }}
-                            >
-                                <Star size={s.size} fill="currentColor" />
-                            </motion.div>
-                        ))}
-
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-32 h-32 rounded-full bg-romantic-pink/10 blur-[60px]" />
-                        </div>
-                    </div>
+                    {/* Constellation Lines SVG */}
+                    <svg className="absolute inset-0 w-full h-full z-10 pointer-events-none opacity-20">
+                        <motion.path
+                            d="M 50 20 L 100 80 L 150 40 L 200 120 L 300 30 L 380 90"
+                            stroke="white"
+                            strokeWidth="0.5"
+                            fill="none"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1 }}
+                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                        />
+                        <motion.circle cx="200" cy="75" r="120" stroke="white" strokeWidth="0.2" fill="none" className="opacity-10" />
+                    </svg>
 
                     {/* Central Connection Light */}
-                    <motion.div
-                        animate={{ opacity: [0.2, 0.5, 0.2] }}
-                        transition={{ repeat: Infinity, duration: 4 }}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-3/4 bg-white/20 blur-sm pointer-events-none"
-                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <motion.div
+                            animate={{ opacity: [0.1, 0.3, 0.1], scale: [1, 1.2, 1] }}
+                            transition={{ duration: 5, repeat: Infinity }}
+                            className="w-[400px] h-px bg-gradient-to-r from-transparent via-romantic-red to-transparent blur-md"
+                        />
+                    </div>
                 </div>
 
                 <div className="text-center mb-10 max-w-md">

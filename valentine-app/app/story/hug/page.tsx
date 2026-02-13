@@ -1,28 +1,47 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Send, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
+import { logInsight } from "@/utils/insights";
 
 export default function HugPage() {
     const { lang } = useAppContext();
     const router = useRouter();
     const [isHugged, setIsHugged] = useState(false);
     const [ripples, setRipples] = useState<number[]>([]);
+    const [msgIndex, setMsgIndex] = useState(0);
+
+    const hugMessages = [
+        "Feel it? That's me, right there with you.",
+        "I'm holding you tight, across the miles.",
+        "Close your eyes... I'm right here.",
+        "Your heart is beating against mine.",
+        "Can you feel the warmth?",
+        "Just a little longer... and it'll be real.",
+        "Sending you all my love in this hug.",
+        "I never want to let go."
+    ];
+
+    useEffect(() => {
+        logInsight('lastPage', 'Hug');
+    }, []);
 
     const startHug = () => {
         setIsHugged(true);
         setRipples(prev => [...prev, Date.now()]);
+        setMsgIndex(prev => (prev + 1) % hugMessages.length);
+        logInsight('hugCount', 1);
 
         // Auto-reset after a while
         setTimeout(() => {
             setIsHugged(false);
-        }, 2000);
+        }, 3000); // Slightly longer to read messages
     };
 
     return (
@@ -52,28 +71,50 @@ export default function HugPage() {
                         ))}
                     </AnimatePresence>
 
+                    {/* Intensifying Glow Backdrop */}
+                    <AnimatePresence>
+                        {isHugged && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 0.4, scale: 1.5 }}
+                                exit={{ opacity: 0, scale: 2 }}
+                                className="absolute inset-0 bg-romantic-red rounded-full blur-3xl -z-10"
+                            />
+                        )}
+                    </AnimatePresence>
+
                     {/* Main Heart Button */}
                     <motion.div
                         whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.9, backgroundColor: "rgba(255,173,173,0.2)" }}
+                        whileTap={{ scale: 1.15 }} // Scale UP when tapping for "hugging" feel
                         onMouseDown={startHug}
                         onTouchStart={startHug}
-                        className={`w-48 h-48 md:w-56 md:h-56 rounded-full glass-card border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-700 ${isHugged ? 'border-romantic-red bg-romantic-red/10 animate-pulse' : 'border-white/10'}`}
+                        className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full glass-card border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-700 shadow-2xl ${isHugged ? 'border-romantic-red bg-romantic-red/20 rotate-3' : 'border-white/10 hover:border-romantic-red/40'}`}
                     >
                         <Heart
                             size={80}
-                            className={`transition-all duration-700 ${isHugged ? 'text-romantic-red fill-current scale-110' : 'text-white/20'}`}
+                            className={`transition-all duration-700 ${isHugged ? 'text-romantic-red fill-current scale-125 drop-shadow-[0_0_20px_rgba(255,77,77,0.8)]' : 'text-white/20'}`}
                         />
                         <span className={`text-[10px] font-black uppercase tracking-[0.3em] mt-4 transition-all duration-700 ${isHugged ? 'text-romantic-red opacity-100' : 'opacity-30'}`}>
                             {isHugged ? "Hugging Ancy..." : "Long Press to Hug"}
                         </span>
+
+                        {/* Haptic Visual Feedback Bar */}
+                        <div className="absolute bottom-10 w-24 h-1 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div
+                                animate={isHugged ? { x: ["-100%", "100%"] } : { x: "-100%" }}
+                                transition={{ repeat: Infinity, duration: 1 }}
+                                className="w-full h-full bg-romantic-red shadow-lg"
+                            />
+                        </div>
                     </motion.div>
 
-                    {/* City Markers */}
+                    {/* Dubai Marker */}
                     <div className="absolute top-0 left-0 flex flex-col items-center gap-1 opacity-40">
                         <span className="text-[10px] font-black uppercase tracking-widest">{content[lang].dubai}</span>
                         <div className="w-1 h-8 bg-white/20 rounded-full" />
                     </div>
+                    {/* India Marker */}
                     <div className="absolute bottom-0 right-0 flex flex-col items-center gap-1 opacity-40">
                         <div className="w-1 h-8 bg-white/20 rounded-full" />
                         <span className="text-[10px] font-black uppercase tracking-widest">{content[lang].tirunelveli}</span>
@@ -81,16 +122,17 @@ export default function HugPage() {
                 </div>
 
                 <div className="w-full space-y-6">
-                    <AnimatePresence>
+                    <AnimatePresence mode="wait">
                         {isHugged && (
                             <motion.div
+                                key={msgIndex}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0 }}
-                                className="text-center"
+                                exit={{ opacity: 0, y: -10 }}
+                                className="text-center h-12 flex items-center justify-center"
                             >
-                                <p className={`text-xl font-black text-romantic-red italic ${lang === 'ta' ? 'font-tamil' : ''}`}>
-                                    "Feel it? That's me, right there with you."
+                                <p className={`text-xl font-black text-romantic-red italic px-4 leading-tight ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                                    "{hugMessages[msgIndex]}"
                                 </p>
                             </motion.div>
                         )}

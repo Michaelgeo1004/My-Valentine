@@ -2,14 +2,21 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Coffee, Film, Music, Utensils, Sparkles, RotateCcw, Heart } from "lucide-react";
+import { Coffee, Film, Music, Utensils, Sparkles, RotateCcw, Heart, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
+import { logInsight } from "@/utils/insights";
 
-const dateIdeas = {
+interface DateIdea {
+    text: string;
+    icon: LucideIcon;
+}
+
+const dateIdeas: Record<string, DateIdea[]> = {
     en: [
         { text: "Virtual Movie Night & Popcorn 🍿", icon: Film },
         { text: "Late Night Video Call Coffee Date ☕", icon: Coffee },
@@ -29,82 +36,117 @@ const dateIdeas = {
 export default function DateGenPage() {
     const { lang } = useAppContext();
     const router = useRouter();
-    const [currentDate, setCurrentDate] = useState<any>(null);
-    const [isGenerating, setIsGenerating] = useState(false);
+    const [rouletteIndex, setRouletteIndex] = useState(0);
+    const [status, setStatus] = useState<"idle" | "spinning" | "winner">("idle");
 
-    const generateDate = () => {
-        setIsGenerating(true);
-        setCurrentDate(null);
+    useEffect(() => {
+        logInsight('lastPage', 'Date Generator');
+    }, []);
 
-        setTimeout(() => {
-            const random = dateIdeas[lang][Math.floor(Math.random() * dateIdeas[lang].length)];
-            setCurrentDate(random);
-            setIsGenerating(false);
-        }, 1200);
+    const startRoulette = () => {
+        setStatus("spinning");
+        let cycles = 0;
+        const maxCycles = 15 + Math.floor(Math.random() * 10);
+
+        const interval = setInterval(() => {
+            setRouletteIndex((prev) => (prev + 1) % dateIdeas[lang].length);
+            cycles++;
+
+            if (cycles >= maxCycles) {
+                clearInterval(interval);
+                setStatus("winner");
+                logInsight('dateResult', dateIdeas[lang][(rouletteIndex + cycles) % dateIdeas[lang].length].text);
+            }
+        }, 100);
     };
+
+    const currentIdea = dateIdeas[lang][rouletteIndex];
 
     return (
         <CinematicContainer>
-            <StoryCard className="max-w-xl">
-                <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
-                    {content[lang].date_title}
-                </h1>
-                <p className="text-sm md:text-base font-medium opacity-60 italic mb-12 text-center px-6">
-                    {content[lang].date_desc}
-                </p>
+            <StoryCard className="max-w-2xl min-h-[600px] flex flex-col justify-between">
+                <div className="w-full">
+                    <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
+                        {content[lang].date_title}
+                    </h1>
+                    <p className="text-sm md:text-base font-medium opacity-60 italic mb-12 text-center px-6">
+                        {content[lang].date_desc}
+                    </p>
+                </div>
 
-                <div className="relative h-64 w-full flex items-center justify-center mb-12">
+                <div className="relative h-80 w-full flex items-center justify-center mb-12">
                     <AnimatePresence mode="wait">
-                        {isGenerating ? (
-                            <motion.div
-                                key="generating"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                                exit={{ opacity: 0, scale: 1.2 }}
-                                className="flex flex-col items-center gap-4"
-                            >
-                                <div className="w-24 h-24 rounded-full border-4 border-dashed border-romantic-red animate-spin flex items-center justify-center">
-                                    <Heart size={32} className="text-romantic-red" />
-                                </div>
-                                <span className="text-xs font-black uppercase tracking-widest opacity-40">Scheduling Love...</span>
-                            </motion.div>
-                        ) : currentDate ? (
-                            <motion.div
-                                key="date"
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="glass-card p-10 rounded-[3rem] border-romantic-red/30 bg-romantic-red/5 flex flex-col items-center gap-6 shadow-2xl w-full"
-                            >
-                                <div className="p-6 rounded-full bg-romantic-red text-white">
-                                    <currentDate.icon size={48} />
-                                </div>
-                                <h2 className={`text-2xl md:text-3xl font-black text-center text-romantic ${lang === 'ta' ? 'font-tamil' : ''}`}>
-                                    {currentDate.text}
-                                </h2>
-                            </motion.div>
-                        ) : (
+                        {status === "idle" ? (
                             <motion.div
                                 key="idle"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="flex flex-col items-center opacity-10"
+                                className="flex flex-col items-center opacity-20 group cursor-pointer"
+                                onClick={startRoulette}
                             >
-                                <Utensils size={100} />
+                                <Utensils size={120} className="group-hover:scale-110 transition-transform" />
+                                <span className="mt-4 text-[10px] font-black uppercase tracking-[0.4em]">Tap to Start Roulette</span>
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="active"
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="w-full flex flex-col items-center gap-8"
+                            >
+                                <div className="relative">
+                                    <motion.div
+                                        animate={status === "spinning" ? { rotate: 360 } : { rotate: 0 }}
+                                        transition={status === "spinning" ? { repeat: Infinity, duration: 0.5, ease: "linear" } : { duration: 0.5 }}
+                                        className="w-40 h-40 rounded-full border-4 border-dashed border-romantic-red flex items-center justify-center"
+                                    >
+                                        <div className="p-8 rounded-full bg-romantic-red/10 text-romantic-red">
+                                            <currentIdea.icon size={64} className={status === "spinning" ? "animate-pulse" : ""} />
+                                        </div>
+                                    </motion.div>
+
+                                    {status === "winner" && (
+                                        <motion.div
+                                            initial={{ scale: 0, rotate: -20 }}
+                                            animate={{ scale: 1, rotate: 0 }}
+                                            className="absolute -top-4 -right-4 bg-romantic-gold text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2"
+                                        >
+                                            <Sparkles size={12} />
+                                            Perfect Match
+                                        </motion.div>
+                                    )}
+                                </div>
+
+                                <motion.div
+                                    key={rouletteIndex}
+                                    initial={{ y: 10, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    className={`text-center space-y-4 px-8 ${status === "winner" ? "bg-romantic-red/5 p-8 rounded-[3rem] border border-romantic-red/20 shadow-xl" : ""}`}
+                                >
+                                    <h2 className={`text-2xl md:text-4xl font-black text-romantic ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                                        {currentIdea.text}
+                                    </h2>
+                                    {status === "spinning" && (
+                                        <div className="flex justify-center gap-1">
+                                            {[1, 2, 3].map(i => <div key={i} className="w-1.5 h-1.5 bg-romantic-red/40 rounded-full animate-bounce" style={{ animationDelay: `${i * 0.1}s` }} />)}
+                                        </div>
+                                    )}
+                                </motion.div>
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 w-full">
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={generateDate}
-                        disabled={isGenerating}
+                        onClick={startRoulette}
+                        disabled={status === "spinning"}
                         className="w-full bg-romantic-pink text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group disabled:opacity-50"
                     >
-                        <Sparkles size={24} className={isGenerating ? "animate-spin" : ""} />
-                        <span>{lang === 'ta' ? 'தேதியைத் திட்டமிடுங்கள்' : 'Plan Our Date'}</span>
+                        <Heart size={24} className={status === "spinning" ? "animate-ping" : "group-hover:scale-125 transition-transform"} />
+                        <span>{status === "winner" ? (lang === 'ta' ? 'மீண்டும் சுழற்று' : 'Spin Again') : (lang === 'ta' ? 'தேதியைத் திட்டமிடுங்கள்' : 'Plan Our Date')}</span>
                     </motion.button>
 
                     <motion.button

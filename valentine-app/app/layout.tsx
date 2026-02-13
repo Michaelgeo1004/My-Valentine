@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Noto_Sans_Tamil } from "next/font/google";
+import { Inter, Noto_Sans_Tamil, Great_Vibes, Cinzel } from "next/font/google";
 import "./globals.css";
-import { AppContextProvider } from "@/context/AppContext";
+import ClientLayout from "./ClientLayout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,6 +11,17 @@ const inter = Inter({
 const tamil = Noto_Sans_Tamil({
   subsets: ["tamil"],
   variable: "--font-tamil",
+});
+
+const greatVibes = Great_Vibes({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-great-vibes",
+});
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  variable: "--font-cinzel",
 });
 
 export const metadata: Metadata = {
@@ -24,14 +35,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${tamil.variable}`}>
-      <body className="antialiased overflow-x-hidden selection:bg-romantic-red/30">
-        <AppContextProvider>
-          <div className="mesh-gradient fixed inset-0 -z-20" />
-          <main className="relative z-10 min-h-[100dvh]">
-            {children}
-          </main>
-        </AppContextProvider>
+    <html lang="en">
+      <body className={`antialiased overflow-x-hidden selection:bg-romantic-red/30 ${greatVibes.variable} ${cinzel.variable}`}>
+        <ClientLayout interClass={inter.variable} tamilClass={tamil.variable}>
+          {children}
+        </ClientLayout>
       </body>
     </html>
   );

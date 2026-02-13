@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { logInsight } from "@/utils/insights";
 import { Mail, MailOpen, Heart, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
@@ -31,6 +32,19 @@ export default function LettersPage() {
     const router = useRouter();
     const [openLetter, setOpenLetter] = useState<number | null>(null);
 
+    useEffect(() => {
+        logInsight('lastPage', 'Letters from the Heart');
+    }, []);
+
+    const handleOpenLetter = (index: number) => {
+        if (openLetter !== index) {
+            setOpenLetter(index);
+            logInsight('hugCount', 1); // Opening a letter is an affection point
+        } else {
+            setOpenLetter(null);
+        }
+    };
+
     return (
         <CinematicContainer>
             <StoryCard className="max-w-xl">
@@ -46,7 +60,7 @@ export default function LettersPage() {
                         <div key={i} className="relative">
                             <motion.div
                                 whileHover={{ scale: 1.02 }}
-                                onClick={() => setOpenLetter(openLetter === i ? null : i)}
+                                onClick={() => handleOpenLetter(i)}
                                 className={`glass-card p-6 rounded-3xl border-white/10 flex items-center justify-between cursor-pointer transition-all duration-500 ${openLetter === i ? 'bg-romantic-red/5 border-romantic-red/40 translate-y-2' : ''}`}
                             >
                                 <div className="flex items-center gap-4">
@@ -64,17 +78,33 @@ export default function LettersPage() {
                             <AnimatePresence>
                                 {openLetter === i && (
                                     <motion.div
-                                        initial={{ opacity: 0, height: 0, y: -10 }}
-                                        animate={{ opacity: 1, height: "auto", y: 0 }}
-                                        exit={{ opacity: 0, height: 0, y: -10 }}
+                                        initial={{ opacity: 0, height: 0, rotateX: -20, originY: 0 }}
+                                        animate={{ opacity: 1, height: "auto", rotateX: 0, originY: 0 }}
+                                        exit={{ opacity: 0, height: 0, rotateX: -20, originY: 0 }}
+                                        transition={{ type: "spring", damping: 20, stiffness: 100 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="mt-4 glass-card p-8 rounded-3xl border-white/20 bg-white/5 mx-2 text-left shadow-inner">
-                                            <p className={`text-base leading-relaxed text-foreground/80 italic ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                                        <div className="mt-4 glass-card p-10 md:p-14 rounded-3xl border-white/20 bg-white/5 mx-2 text-left shadow-2xl relative overflow-hidden">
+                                            {/* Paper Texture Overlay */}
+                                            <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/paper-fibers.png")' }} />
+
+                                            {/* Decorative Seal */}
+                                            <div className="absolute top-4 right-4 text-romantic-red/10">
+                                                <Heart size={40} className="fill-current" />
+                                            </div>
+
+                                            <p className={`text-lg md:text-xl leading-relaxed text-foreground/90 font-serif mb-8 border-l-4 border-romantic-red/20 pl-6 ${lang === 'ta' ? 'font-tamil' : ''}`}>
                                                 {letter.text}
                                             </p>
-                                            <div className="mt-6 flex justify-end">
-                                                <p className="font-black text-romantic-red tracking-widest text-xs">- Your Driver (Geo)</p>
+
+                                            <div className="mt-8 flex justify-end items-center gap-4 border-t border-white/5 pt-6">
+                                                <div className="text-right">
+                                                    <p className="font-handwriting text-2xl text-romantic-red italic">Geo</p>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest opacity-30">Your Favorite Driver</p>
+                                                </div>
+                                                <div className="w-10 h-10 rounded-full bg-romantic-red/10 flex items-center justify-center text-romantic-red">
+                                                    <Heart size={20} className="fill-current" />
+                                                </div>
                                             </div>
                                         </div>
                                     </motion.div>

@@ -56,7 +56,6 @@ export default function WorldPage() {
                             {currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' })}
                         </div>
                         <div className="text-[10px] md:text-sm font-bold opacity-60 uppercase tracking-widest relative z-10">{content[lang].tirunelveli_label}</div>
-                        <div className="text-[10px] font-black text-romantic-red mt-1 relative z-10 tracking-widest uppercase">@{content[lang].insta_handle}</div>
                         <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
                             <Sun size={100} />
                         </div>

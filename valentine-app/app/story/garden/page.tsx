@@ -8,6 +8,7 @@ import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
+import { logInsight } from "@/utils/insights";
 
 interface LeafTrail {
     x: number;
@@ -24,6 +25,10 @@ export default function GardenPage() {
     const nextId = useRef(0);
     const containerRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        logInsight('lastPage', 'Garden of Memories');
+    }, []);
+
     const handleInteraction = (clientX: number, clientY: number) => {
         if (!containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
@@ -39,6 +44,7 @@ export default function GardenPage() {
         };
 
         setTrails(prev => [...prev.slice(-40), newLeaf]);
+        logInsight('hugCount', 0.1); // Small affection points for drawing
     };
 
     const onMouseMove = (e: React.MouseEvent) => {
@@ -109,10 +115,10 @@ export default function GardenPage() {
                     </button>
                     <motion.button
                         whileHover={{ scale: 1.02 }}
-                        onClick={() => router.push("/story/soundtrack")}
+                        onClick={() => router.push("/story/adventure")}
                         className="flex-1 bg-romantic-red text-white py-4 rounded-2xl font-black text-lg shadow-xl flex items-center justify-center gap-3 group"
                     >
-                        <span>{content[lang].cta_garden}</span>
+                        <span>{content[lang].cta_adventure}</span>
                         <RotateCcw size={20} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
                     </motion.button>
                 </div>

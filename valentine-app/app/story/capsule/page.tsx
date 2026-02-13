@@ -3,86 +3,146 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Unlock, Sparkles, RotateCcw, Shield } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
-import { useState } from "react";
+import { logInsight } from "@/utils/insights";
 
 export default function TimeCapsulePage() {
   const { lang } = useAppContext();
   const router = useRouter();
-  const [isLocked, setIsLocked] = useState(true);
+  const [status, setStatus] = useState<"locked" | "decoding" | "sealed">("locked");
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    logInsight('lastPage', 'Time Capsule');
+  }, []);
+
+  const handleSeal = () => {
+    setStatus("decoding");
+    logInsight('capsuleSealed', true);
+    let p = 0;
+    const interval = setInterval(() => {
+      p += Math.random() * 15;
+      if (p >= 100) {
+        p = 100;
+        clearInterval(interval);
+        setTimeout(() => setStatus("sealed"), 500);
+      }
+      setProgress(p);
+    }, 200);
+  };
 
   return (
     <CinematicContainer>
-      <StoryCard className="max-w-xl flex flex-col items-center">
-        <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
-          {content[lang].capsule_title}
-        </h1>
-        <p className="text-sm md:text-base font-medium opacity-60 italic mb-12 text-center px-6">
-          {content[lang].capsule_desc}
-        </p>
+      <StoryCard className="max-w-2xl flex flex-col items-center min-h-[600px] justify-between">
+        <div className="w-full">
+          <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
+            {content[lang].capsule_title}
+          </h1>
+          <p className="text-sm md:text-base font-medium opacity-60 italic mb-12 text-center px-6">
+            {content[lang].capsule_desc}
+          </p>
+        </div>
 
         {/* Futuristic Locked Capsule UI */}
-        <div className="relative w-full aspect-square max-w-[280px] flex items-center justify-center mb-12 group">
+        <div className="relative w-full aspect-square max-w-[300px] flex items-center justify-center mb-12">
+          {/* Outer Ring */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+            className="absolute inset-0 border border-white/5 rounded-[4rem] scale-110"
+          />
+
           <motion.div
             animate={{
-              rotate: isLocked ? [0, 5, -5, 0] : 0,
-              scale: isLocked ? [1, 1.02, 1] : 1.1
+              rotate: status === "locked" ? [0, 2, -2, 0] : 0,
+              scale: status === "sealed" ? 1.1 : 1,
+              filter: status === "decoding" ? ["blur(0px)", "blur(2px)", "blur(0px)"] : "blur(0px)"
             }}
             transition={{ repeat: Infinity, duration: 4 }}
-            className={`w-full h-full rounded-[4rem] flex items-center justify-center transition-all duration-700 shadow-2xl ${isLocked ? 'bg-white/5 border border-white/10 backdrop-blur-3xl' : 'bg-romantic-red/10 border-romantic-red/40 backdrop-blur-3xl scale-110'}`}
+            className={`w-full h-full rounded-[4rem] flex flex-col items-center justify-center transition-all duration-700 shadow-2xl relative overflow-hidden ${status === 'locked' ? 'bg-white/5 border border-white/10 backdrop-blur-3xl group cursor-pointer hover:bg-white/10' : status === 'decoding' ? 'bg-romantic-red/5 border-romantic-red/20' : 'bg-romantic-red/10 border-romantic-gold/40 backdrop-blur-3xl shadow-[0_0_50px_rgba(255,215,0,0.2)]'}`}
+            onClick={() => status === "locked" && handleSeal()}
           >
-            <div className="relative">
+            <div className="relative z-10">
               <AnimatePresence mode="wait">
-                {isLocked ? (
+                {status === "locked" ? (
                   <motion.div
                     key="locked"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 1.2, rotate: 180 }}
-                    onClick={() => setIsLocked(false)}
-                    className="cursor-pointer text-romantic-red flex flex-col items-center gap-4"
+                    className="flex flex-col items-center gap-4"
                   >
-                    <Lock size={80} className="drop-shadow-[0_0_15px_rgba(255,173,173,0.5)]" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Tap to Seal Forever</span>
+                    <Lock size={80} className="text-romantic-red drop-shadow-[0_0_15px_rgba(255,173,173,0.5)]" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 group-hover:opacity-100 transition-opacity">Tap to Seal Forever</span>
+                  </motion.div>
+                ) : status === "decoding" ? (
+                  <motion.div
+                    key="decoding"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex flex-col items-center gap-6 w-full px-8"
+                  >
+                    <div className="relative">
+                      <Shield size={60} className="text-romantic-gold animate-pulse" />
+                      <motion.div
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.5 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <Sparkles size={30} className="text-white" />
+                      </motion.div>
+                    </div>
+                    <div className="w-full space-y-2">
+                      <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-romantic-gold">
+                        <span>Encrypting</span>
+                        <span>{Math.round(progress)}%</span>
+                      </div>
+                      <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-romantic-gold"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
                   </motion.div>
                 ) : (
                   <motion.div
-                    key="unlocked"
+                    key="sealed"
                     initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
                     animate={{ opacity: 1, scale: 1, rotate: 0 }}
                     className="text-romantic-gold flex flex-col items-center gap-4"
                   >
-                    <Unlock size={80} className="drop-shadow-[0_0_15px_rgba(255,215,0,0.5)]" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em]">Sealed with Love</span>
+                    <div className="relative">
+                      <Unlock size={80} className="drop-shadow-[0_0_20px_rgba(255,215,0,0.6)]" />
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [1, 2], opacity: [0.5, 0] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        className="absolute inset-0 bg-romantic-gold rounded-full -z-10"
+                      />
+                    </div>
+                    <span className="text-xs font-black uppercase tracking-[0.4em]">Sealed with Love</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3].map(i => <div key={i} className="w-1 h-1 bg-romantic-gold rounded-full animate-bounce" style={{ animationDelay: `${i * 0.2}s` }} />)}
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
 
-              {/* Floating Particles around capsule */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-                className="absolute inset-0 -m-8 pointer-events-none"
-              >
-                <Sparkles size={20} className="absolute top-0 left-1/2 text-romantic-gold/40" />
-                <Sparkles size={16} className="absolute bottom-0 right-1/4 text-romantic-red/30" />
-                <Sparkles size={14} className="absolute top-1/2 right-0 text-white/20" />
-              </motion.div>
+            {/* Futuristic Grid Overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-5">
+              <div className="w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
             </div>
           </motion.div>
-
-          {/* Futuristic Data Stream Overlay (Subtle) */}
-          <div className="absolute inset-0 overflow-hidden rounded-[4rem] pointer-events-none opacity-20">
-            <div className="absolute inset-0 bg-gradient-to-t from-romantic-red/20 to-transparent" />
-            <div className="absolute top-0 left-0 w-full h-px bg-white/40 animate-scanline" />
-          </div>
         </div>
 
         <div className="w-full space-y-6">
-          {!isLocked && (
+          {status === "sealed" && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -93,7 +153,7 @@ export default function TimeCapsulePage() {
                 <h3 className="font-black tracking-widest text-xs uppercase">Future Promise Encrypted</h3>
               </div>
               <p className={`text-lg italic text-romantic ${lang === 'ta' ? 'font-tamil' : ''}`}>
-                "The best is yet to come. March 25th holds a special key."
+                "The best is yet to come. Our future is the greatest story ever written."
               </p>
             </motion.div>
           )}

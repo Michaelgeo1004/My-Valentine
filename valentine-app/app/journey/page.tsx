@@ -33,9 +33,9 @@ export default function JourneyPage() {
                         </div>
 
                         <div className="flex-1 relative flex items-center justify-center -my-4">
-                            <svg width="100%" height="120" viewBox="0 0 400 120" className="overflow-visible scale-110 md:scale-125">
+                            <svg width="100%" height="150" viewBox="0 0 400 150" className="overflow-visible scale-110 md:scale-125">
                                 <motion.path
-                                    d="M 40 80 Q 200 0 360 80"
+                                    d="M 40 100 C 120 20, 280 20, 360 100"
                                     fill="transparent"
                                     stroke="currentColor"
                                     strokeWidth="2"
@@ -43,7 +43,7 @@ export default function JourneyPage() {
                                     className="opacity-10"
                                 />
                                 <motion.path
-                                    d="M 40 80 Q 200 0 360 80"
+                                    d="M 40 100 C 120 20, 280 20, 360 100"
                                     fill="transparent"
                                     stroke="url(#pathGradientJourney)"
                                     strokeWidth="3"
@@ -63,11 +63,11 @@ export default function JourneyPage() {
                                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                 >
                                     <motion.g
-                                        style={{ offsetPath: "path('M 40 80 Q 200 0 360 80')", offsetRotate: "auto" }}
+                                        style={{ offsetPath: "path('M 40 100 C 120 20, 280 20, 360 100')", offsetRotate: "auto" }}
                                         animate={{ offsetDistance: ["0%", "100%"] }}
                                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                     >
-                                        <Plane size={24} className="text-romantic-red fill-current -rotate-45" />
+                                        <Plane size={24} className="text-romantic-red fill-current rotate-45" />
                                         <motion.circle
                                             r="12"
                                             fill="currentColor"
@@ -80,11 +80,9 @@ export default function JourneyPage() {
                             </svg>
                         </div>
 
-                        <div className="text-center shrink-0">
-                            <p className="text-base md:text-lg font-bold text-romantic italic max-w-xs mx-auto leading-relaxed">
-                                "{content[lang].distance_quote}"
-                            </p>
-                        </div>
+                        <p className="text-base md:text-lg font-bold text-romantic italic max-w-xs mx-auto leading-relaxed">
+                            &quot;{content[lang].distance_quote}&quot;
+                        </p>
                     </div>
                 </div>
 

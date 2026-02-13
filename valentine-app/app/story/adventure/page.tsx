@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
-import { CheckCircle2, Circle, Plane, Camera, Coffee, Heart, RotateCcw } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle2, Circle, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
@@ -10,11 +10,20 @@ import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
 
 import { adventuresList } from "@/constants/adventures";
+import { logInsight } from "@/utils/insights";
 
 export default function AdventurePage() {
     const { lang } = useAppContext();
     const router = useRouter();
     const [completed, setCompleted] = useState<number[]>([]);
+
+    useEffect(() => {
+        if (completed.length > 0) {
+            const selectedItems = completed.map(i => adventuresList[lang as 'en' | 'ta'][i].text);
+            logInsight('selections', selectedItems);
+        }
+        logInsight('lastPage', 'Adventure');
+    }, [completed, lang]);
 
     const toggleItem = (index: number) => {
         setCompleted(prev =>
@@ -22,17 +31,32 @@ export default function AdventurePage() {
         );
     };
 
+    const isReady = completed.length >= 5;
+
+    const shareWithGeo = () => {
+        const selectedTexts = completed.map(i => adventuresList[lang as 'en' | 'ta'][i].text);
+        const message = `Hey Geo! 🧸 I've picked these 5+ adventures for our reunion: \n\n${selectedTexts.join("\n")}\n\nCan't wait! ❤️`;
+        const encoded = encodeURIComponent(message);
+        window.open(`https://wa.me/?text=${encoded}`, '_blank');
+    };
+
     return (
         <CinematicContainer>
             <StoryCard className="max-w-xl">
-                <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
-                    {content[lang].adventure_title}
-                </h1>
-                <p className="text-sm md:text-base font-medium opacity-60 italic mb-10 text-center px-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl md:text-5xl font-black text-romantic">
+                        {content[lang].adventure_title}
+                    </h1>
+                    <div className={`px-4 py-2 rounded-full font-black text-sm border-2 transition-all ${isReady ? 'bg-romantic-red border-romantic-red text-white' : 'bg-romantic-red/5 border-romantic-red/20 text-romantic-red'}`}>
+                        {completed.length} / 5
+                    </div>
+                </div>
+
+                <p className="text-sm md:text-base font-medium opacity-60 italic mb-8 text-center px-6">
                     {content[lang].adventure_desc}
                 </p>
 
-                <div className="space-y-4 w-full text-left mb-10 h-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                <div className="space-y-4 w-full text-left mb-10 h-[380px] overflow-y-auto pr-2 scrollbar-hide">
                     {adventuresList[lang as 'en' | 'ta'].map((item: any, i: number) => (
                         <motion.div
                             key={i}
@@ -60,18 +84,30 @@ export default function AdventurePage() {
                     ))}
                 </div>
 
-                <div className="w-full">
+                <div className="w-full space-y-4">
+                    {isReady && (
+                        <motion.button
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            onClick={shareWithGeo}
+                            className="w-full bg-green-500/20 text-green-500 border border-green-500/30 py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 hover:bg-green-500 hover:text-white transition-all group shadow-lg"
+                        >
+                            <span>Share my Choices with Geo 📲</span>
+                        </motion.button>
+                    )}
+
                     <motion.button
-                        whileHover={{ scale: 1.05 }}
+                        whileHover={isReady ? { scale: 1.05 } : {}}
+                        disabled={!isReady}
                         onClick={() => router.push("/story/hearts")}
-                        className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
+                        className={`w-full py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group transition-all ${isReady ? 'bg-romantic-red text-white cursor-pointer hover:shadow-romantic-red/40' : 'bg-white/5 text-white/20 border border-white/10 cursor-not-allowed opacity-50'}`}
                     >
                         <span>{content[lang].cta_adventure}</span>
-                        <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                        <RotateCcw size={22} className={`rotate-90 transition-transform duration-500 ${isReady ? 'group-hover:rotate-180' : ''}`} />
                     </motion.button>
 
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 text-center mt-6">
-                        TAP ITEMS TO "ADVENTURE" TOGETHER
+                    <p className={`text-[10px] font-black uppercase tracking-[0.2em] text-center mt-6 transition-colors ${isReady ? 'text-romantic-red opacity-100' : 'opacity-30'}`}>
+                        {isReady ? "JOURNEY READY!" : "SELECT AT LEAST 5 TO CONTINUE"}
                     </p>
                 </div>
             </StoryCard>

@@ -46,11 +46,11 @@ export const CinematicContainer = ({ children, showParticles = true }: Cinematic
                 className="fixed bottom-4 md:bottom-8 flex flex-wrap justify-center items-center gap-3 md:gap-8 text-[9px] md:text-xs font-bold uppercase tracking-widest px-4 text-center z-50 pointer-events-none"
             >
                 <div className="flex items-center gap-2 group cursor-help pointer-events-auto">
-                    <MapPin size={14} className="text-romantic-red group-hover:animate-bounce shrink-0" /> Deira, Dubai
+                    <MapPin size={14} className="text-romantic-red group-hover:animate-bounce shrink-0" /> Dubai
                 </div>
                 <div className="hidden sm:block h-px w-8 md:w-12 bg-romantic-red/30" />
                 <div className="flex items-center gap-2 group cursor-help pointer-events-auto">
-                    <MapPin size={14} className="text-romantic-red group-hover:animate-bounce shrink-0" /> Tirunelveli, India
+                    <MapPin size={14} className="text-romantic-red group-hover:animate-bounce shrink-0" /> India
                 </div>
                 <div className="hidden sm:block h-px w-8 md:w-12 bg-romantic-red/30" />
                 <div className="w-full sm:w-auto flex justify-center items-center gap-2">
