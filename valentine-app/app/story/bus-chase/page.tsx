@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bus, MousePointer2, Heart, RotateCcw } from "lucide-react";
+import { Bus, MousePointer2, Heart, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
@@ -109,7 +109,7 @@ export default function BusChasePage() {
                     className="mt-12 w-full glass-card py-5 rounded-3xl font-black text-romantic-red hover:bg-romantic-red hover:text-white transition-all flex items-center justify-center gap-4 group"
                 >
                     <span className="text-lg">{content[lang].continue_story}</span>
-                    <RotateCcw size={20} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-500" />
                 </motion.button>
             </StoryCard>
         </CinematicContainer>

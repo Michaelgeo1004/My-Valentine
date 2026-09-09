@@ -1,47 +1,62 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { Heart, Send, RotateCcw } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Heart, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
+import { hugMessages } from "@/constants/hugMessages";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
 import { logInsight } from "@/utils/insights";
 
+const HOLD_DURATION_MS = 900;
+
 export default function HugPage() {
     const { lang } = useAppContext();
     const router = useRouter();
+    const [isHolding, setIsHolding] = useState(false);
     const [isHugged, setIsHugged] = useState(false);
     const [ripples, setRipples] = useState<number[]>([]);
     const [msgIndex, setMsgIndex] = useState(0);
-
-    const hugMessages = [
-        "Feel it? That's me, right there with you.",
-        "I'm holding you tight, across the miles.",
-        "Close your eyes... I'm right here.",
-        "Your heart is beating against mine.",
-        "Can you feel the warmth?",
-        "Just a little longer... and it'll be real.",
-        "Sending you all my love in this hug.",
-        "I never want to let go."
-    ];
+    const holdTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const messages = hugMessages[lang as 'en' | 'ta'];
 
     useEffect(() => {
         logInsight('lastPage', 'Hug');
     }, []);
 
-    const startHug = () => {
+    const completeHug = () => {
         setIsHugged(true);
         setRipples(prev => [...prev, Date.now()]);
-        setMsgIndex(prev => (prev + 1) % hugMessages.length);
+        setMsgIndex(prev => (prev + 1) % messages.length);
         logInsight('hugCount', 1);
 
         // Auto-reset after a while
         setTimeout(() => {
             setIsHugged(false);
         }, 3000); // Slightly longer to read messages
+    };
+
+    // The description says "hold to send a hug" — so the button now actually
+    // requires holding it, with the glow building up during the hold, instead
+    // of firing the full effect the instant you touch it.
+    const beginHold = () => {
+        setIsHolding(true);
+        holdTimeout.current = setTimeout(() => {
+            holdTimeout.current = null;
+            setIsHolding(false);
+            completeHug();
+        }, HOLD_DURATION_MS);
+    };
+
+    const cancelHold = () => {
+        if (holdTimeout.current) {
+            clearTimeout(holdTimeout.current);
+            holdTimeout.current = null;
+        }
+        setIsHolding(false);
     };
 
     return (
@@ -87,16 +102,37 @@ export default function HugPage() {
                     <motion.div
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 1.15 }} // Scale UP when tapping for "hugging" feel
-                        onMouseDown={startHug}
-                        onTouchStart={startHug}
-                        className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full glass-card border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-700 shadow-2xl ${isHugged ? 'border-romantic-red bg-romantic-red/20 rotate-3' : 'border-white/10 hover:border-romantic-red/40'}`}
+                        onMouseDown={beginHold}
+                        onMouseUp={cancelHold}
+                        onMouseLeave={cancelHold}
+                        onTouchStart={beginHold}
+                        onTouchEnd={cancelHold}
+                        onTouchCancel={cancelHold}
+                        onContextMenu={(e) => e.preventDefault()}
+                        className={`relative w-48 h-48 md:w-56 md:h-56 rounded-full glass-card border-2 flex flex-col items-center justify-center cursor-pointer transition-all duration-700 shadow-2xl overflow-hidden select-none touch-none ${isHugged ? 'border-romantic-red bg-romantic-red/20 rotate-3' : 'border-white/10 hover:border-romantic-red/40'}`}
+                        style={{ WebkitTouchCallout: "none", WebkitUserSelect: "none" }}
                     >
+                        {/* Charging glow — grows over the hold duration so releasing
+                            early visibly fails to fill it, matching "hold to hug". */}
+                        <AnimatePresence>
+                            {isHolding && (
+                                <motion.div
+                                    key="charging"
+                                    initial={{ scale: 0, opacity: 0.7 }}
+                                    animate={{ scale: 1.4, opacity: 0.9 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    transition={{ duration: HOLD_DURATION_MS / 1000, ease: "linear" }}
+                                    className="absolute inset-0 rounded-full bg-romantic-red/40 blur-xl"
+                                />
+                            )}
+                        </AnimatePresence>
+
                         <Heart
                             size={80}
-                            className={`transition-all duration-700 ${isHugged ? 'text-romantic-red fill-current scale-125 drop-shadow-[0_0_20px_rgba(255,77,77,0.8)]' : 'text-white/20'}`}
+                            className={`relative transition-all duration-700 ${isHugged ? 'text-romantic-red fill-current scale-125 drop-shadow-[0_0_20px_rgba(255,77,77,0.8)]' : isHolding ? 'text-romantic-red/70 scale-110' : 'text-white/20'}`}
                         />
-                        <span className={`text-[10px] font-black uppercase tracking-[0.3em] mt-4 transition-all duration-700 ${isHugged ? 'text-romantic-red opacity-100' : 'opacity-30'}`}>
-                            {isHugged ? "Hugging Ancy..." : "Long Press to Hug"}
+                        <span className={`relative text-[10px] font-black uppercase tracking-[0.3em] mt-4 transition-all duration-700 ${isHugged ? 'text-romantic-red opacity-100' : 'opacity-30'} ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                            {isHugged ? content[lang].hug_hugging_label : content[lang].hug_long_press_label}
                         </span>
 
                         {/* Haptic Visual Feedback Bar */}
@@ -132,7 +168,7 @@ export default function HugPage() {
                                 className="text-center h-12 flex items-center justify-center"
                             >
                                 <p className={`text-xl font-black text-romantic-red italic px-4 leading-tight ${lang === 'ta' ? 'font-tamil' : ''}`}>
-                                    "{hugMessages[msgIndex]}"
+                                    "{messages[msgIndex]}"
                                 </p>
                             </motion.div>
                         )}
@@ -143,9 +179,8 @@ export default function HugPage() {
                         onClick={() => router.push("/story/poetry")}
                         className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
                     >
-                        <Send size={20} className="group-hover:translate-x-1 transition-transform" />
                         <span>{content[lang].cta_hug}</span>
-                        <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                        <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform duration-500" />
                     </motion.button>
                 </div>
             </StoryCard>

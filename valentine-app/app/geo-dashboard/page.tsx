@@ -6,10 +6,11 @@ import { useRouter } from "next/navigation";
 import { ShieldAlert, Heart, Calendar, ArrowLeft, RefreshCw, Trash2, Sparkles } from "lucide-react";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
+import type { HeartbeatData } from "@/utils/insights";
 
 export default function GeoDashboard() {
     const router = useRouter();
-    const [data, setData] = useState<any>(null);
+    const [data, setData] = useState<HeartbeatData | null>(null);
     const [lastUpdated, setLastUpdated] = useState<string>("");
 
     const loadData = () => {
@@ -43,10 +44,10 @@ export default function GeoDashboard() {
                             <ShieldAlert size={28} />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-black text-romantic uppercase tracking-tighter">Geo's Planning Room</h1>
+                            <h1 className="text-2xl font-black text-romantic uppercase tracking-tighter">Geo's Private Room</h1>
                             <p className="text-[10px] font-bold opacity-40 uppercase tracking-widest flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                Live Insights View • Refreshed {lastUpdated}
+                                This Device Only • Refreshed {lastUpdated}
                             </p>
                         </div>
                     </div>
@@ -61,7 +62,7 @@ export default function GeoDashboard() {
                 {!data ? (
                     <div className="text-center py-20 opacity-40 flex flex-col items-center gap-4">
                         <RefreshCw size={48} className="animate-spin-slow opacity-20" />
-                        <p className="font-bold italic">No choices captured yet... <br /> Waiting for Ancy to start her journey.</p>
+                        <p className="font-bold italic">No choices captured yet... <br /> This fills in once the journey begins.</p>
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -145,7 +146,7 @@ export default function GeoDashboard() {
 
                         <div className="text-center pt-2">
                             <span className="text-[8px] font-black opacity-20 uppercase tracking-[0.3em]">
-                                Verified Insights • Sync Active • {new Date(data.lastUpdated || data.timestamp).toLocaleTimeString()}
+                                Local Device Snapshot • Not Synced • {new Date(data.lastUpdated || data.timestamp).toLocaleTimeString()}
                             </span>
                         </div>
 
@@ -164,7 +165,7 @@ export default function GeoDashboard() {
 
                 <div className="mt-12 text-center">
                     <p className="text-[9px] font-medium opacity-20 italic">
-                        This view is for Geo's eyes only. <br /> Use this data to plan the most perfect reunion ever. ❤️
+                        This view is for Geo's eyes only. <br /> A private record of this journey, kept close to my heart. ❤️
                     </p>
                 </div>
             </StoryCard>

@@ -134,6 +134,13 @@ body {
   min-height: 100vh;
 }
 
+/* Custom cursor: dotted maple leaf, matches the app's shared symbol (desktop only; touch ignores this) */
+/* Applied to * (not just body) because native form controls like <button> don't reliably inherit a custom cursor from an ancestor. */
+* {
+  cursor: url("data:image/png;base64,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") 8 8, auto;
+}
+
+
 /* Premium Animated Mesh Gradient Background */
 .mesh-gradient {
   position: fixed;
@@ -255,4 +262,32 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
   /* Chrome, Safari and Opera */
+}
+
+/* 3D cube face transforms (used on the memory cube page). Defined here instead of a
+   per-page styled-jsx block so they're always present from first paint — a page-scoped
+   <style jsx> can inject a beat late on client-side navigation, causing a flash where the
+   cube's faces render flat/stacked before the rotation classes apply. */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+.rotate-y-90 {
+  transform: rotateY(90deg);
+}
+
+.-rotate-y-90 {
+  transform: rotateY(-90deg);
+}
+
+.rotate-x-90 {
+  transform: rotateX(90deg);
+}
+
+.-rotate-x-90 {
+  transform: rotateX(-90deg);
 }

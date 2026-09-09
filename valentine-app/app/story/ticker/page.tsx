@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { Clock, Heart, RotateCcw } from "lucide-react";
+import { Clock, Heart, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
+import { logInsight } from "@/utils/insights";
 
 export default function TickerPage() {
     const { lang } = useAppContext();
@@ -15,6 +16,10 @@ export default function TickerPage() {
     const [timeLeft, setTimeLeft] = useState({
         years: 0, months: 0, days: 0, hours: 0, minutes: 0, seconds: 0
     });
+
+    useEffect(() => {
+        logInsight('lastPage', 'Love Ticker');
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -58,8 +63,8 @@ export default function TickerPage() {
     return (
         <CinematicContainer>
             <StoryCard className="max-w-xl">
-                <div className="text-center mb-8">
-                    <Clock size={48} className="text-romantic-red mx-auto mb-4 animate-pulse opacity-50" />
+                <div className="text-center mb-6">
+                    <Clock size={40} className="text-romantic-red mx-auto mb-3 animate-pulse opacity-50" />
                     <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic">
                         {content[lang].ticker_title}
                     </h1>
@@ -69,7 +74,7 @@ export default function TickerPage() {
                 </div>
 
                 {/* Ticker Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                     {timeItems.map((item, i) => (
                         <motion.div
                             key={item.label}
@@ -94,19 +99,12 @@ export default function TickerPage() {
                 </div>
 
                 {/* Life Milestones */}
-                <div className="mb-12">
-                    <h3 className="text-sm font-black uppercase tracking-[0.2em] opacity-40 mb-6 text-center">Milestones of Us</h3>
-                    <div className="space-y-4">
-                        {[
-                            { label: "Days since our first kiss", val: Math.floor((new Date().getTime() - new Date("2021-03-25").getTime()) / (1000 * 60 * 60 * 24)) },
-                            { label: "Dreams shared in distance", val: "∞" },
-                            { label: "Miles traveled in thoughts", val: "2,845,000+" }
-                        ].map((m, i) => (
-                            <div key={i} className="flex justify-between items-center p-4 glass-card rounded-2xl border-white/5">
-                                <span className="text-[10px] md:text-sm font-bold opacity-60 truncate">{m.label}</span>
-                                <span className="text-romantic font-black">{m.val}</span>
-                            </div>
-                        ))}
+                <div className="mb-6">
+                    <div className="flex justify-between items-center p-4 glass-card rounded-2xl border-white/5">
+                        <span className="text-[10px] md:text-sm font-bold opacity-60 truncate">Days since our first kiss</span>
+                        <span className="text-romantic font-black">
+                            {Math.floor((new Date().getTime() - new Date("2023-03-25").getTime()) / (1000 * 60 * 60 * 24))}
+                        </span>
                     </div>
                 </div>
 
@@ -114,7 +112,7 @@ export default function TickerPage() {
                     <motion.div
                         animate={{ scale: [1, 1.05, 1], rotate: [0, 1, 0] }}
                         transition={{ repeat: Infinity, duration: 3 }}
-                        className="bg-romantic-red/5 border border-romantic-red/20 p-6 rounded-3xl mb-8 flex items-center justify-center gap-4"
+                        className="bg-romantic-red/5 border border-romantic-red/20 p-4 rounded-3xl mb-4 flex items-center justify-center gap-4"
                     >
                         <Heart className="text-romantic-red fill-current" />
                         <p className="text-sm md:text-lg font-black italic text-romantic">
@@ -125,10 +123,10 @@ export default function TickerPage() {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         onClick={() => router.push("/story/letters")}
-                        className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
+                        className="w-full bg-romantic-red text-white py-3 rounded-2xl font-black text-base shadow-lg flex items-center justify-center gap-3 group"
                     >
-                        <span>{content[lang].cta_letters}</span>
-                        <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                        <span>{content[lang].cta_ticker}</span>
+                        <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-500" />
                     </motion.button>
                 </div>
             </StoryCard>

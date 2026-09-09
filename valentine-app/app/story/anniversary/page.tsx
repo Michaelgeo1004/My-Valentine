@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo } from "react";
-import { Heart, Calendar, Sparkles, RotateCcw } from "lucide-react";
+import { Heart, Calendar, Sparkles, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
@@ -52,15 +52,15 @@ export default function AnniversaryPage() {
     const router = useRouter();
     const [revealed, setRevealed] = useState(false);
 
-    // Calculate time since Nov 27, 2022
-    const startDate = new Date("2022-11-27");
+    // Calculate time since Jan 22, 2021 — the day they first met
+    const startDate = new Date("2021-01-22");
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - startDate.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     return (
         <CinematicContainer>
-            <StoryCard className="max-w-2xl flex flex-col items-center min-h-[700px]">
+            <StoryCard className="max-w-2xl flex flex-col items-center">
                 <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
                     {content[lang].anniversary_title}
                 </h1>
@@ -111,8 +111,8 @@ export default function AnniversaryPage() {
                                 </motion.div>
 
                                 <div className="space-y-1">
-                                    <h2 className="text-3xl font-black text-romantic">March 25</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-romantic-red opacity-80">Our Forever Date</p>
+                                    <h2 className="text-3xl font-black text-romantic">January 22</h2>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-romantic-red opacity-80">Where It Began</p>
                                 </div>
 
                                 <motion.div
@@ -137,7 +137,7 @@ export default function AnniversaryPage() {
                             className="text-center bg-white/5 p-6 rounded-3xl border border-white/5 shadow-inner"
                         >
                             <p className={`text-xl font-bold italic text-romantic leading-relaxed ${lang === 'ta' ? 'font-tamil' : ''}`}>
-                                "That first kiss, on an empty road—the most beautiful moment in the most unexpected place. It was the beginning of my favorite story: Us."
+                                "Just two people crossing paths that day, with no idea it was the start of forever. That hello became my favorite story: Us."
                             </p>
                         </motion.div>
                     )}
@@ -148,7 +148,7 @@ export default function AnniversaryPage() {
                         className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
                     >
                         <span>{content[lang].cta_anniversary}</span>
-                        <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                        <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform duration-500" />
                     </motion.button>
                 </div>
             </StoryCard>

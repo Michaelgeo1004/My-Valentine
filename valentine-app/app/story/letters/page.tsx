@@ -1,9 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { logInsight } from "@/utils/insights";
-import { Mail, MailOpen, Heart, RotateCcw } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { logInsight, sendTrackBeacon, useOnRealUnmount } from "@/utils/insights";
+import { Mail, MailOpen, Heart, Star, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
@@ -12,18 +12,18 @@ import { StoryCard } from "@/components/StoryCard";
 
 const lettersData = {
     en: [
-        { title: "To my Muhh", date: "Jan 22, 2021", text: "From the very first day, I knew you were different. Your kindness and your stubbornness (just like mine) made me realize we were meant for each other. 5 years is just the beginning." },
-        { title: "The Dubai Note", date: "2023 Reflection", text: "Every morning in Dubai, despite the heat and the distance, I wake up with one thought: I'm working for our future. You are my North Star, guiding me back home." },
+        { title: "To my Muhh", date: "Jan 22, 2021", text: "From the very first day, I knew you were different. Your kindness and your stubbornness—just like mine—made me realize how rare you were. Those 5 years were just the beginning of a love that still hasn't ended." },
+        { title: "The Dubai Note", date: "2023 Reflection", text: "Every morning in Dubai, despite the heat and the distance, I wake up with one thought of you. You are my North Star, guiding me back home." },
         { title: "College Days", date: "Loyola Memory", text: "I still remember the thrill of chasing your bus. That 1000/100 ego of mine? It never stood a chance against your beautiful smile. I'd chase that bus forever if it meant seeing you." },
-        { title: "The Blood Art", date: "Emotional Soul", text: "That piece of art I gave you... it wasn't just colors on a page. It was my heartbeat, my soul, the deepest parts of me showing you how much you truly mean to me. It's a 'heart touching' bond we share." },
-        { title: "The Promise", date: "Forever", text: "I need to be with you till my last breath. You are my most priority, not the least—never the least. I'm not doing things for me, I'm doing them for us. You are my world." }
+        { title: "The Blood Art", date: "Emotional Soul", text: "That piece of art I gave you... it wasn't just colors on a page. It was my heartbeat, my soul, the deepest parts of me showing you how much you mean to me. It's a bond that will always be ours." },
+        { title: "The Promise", date: "Forever", text: "You are, and always will be, one of my truest priorities—never the least. I did the things I did for us, and I still mean every one of them. You were my world, and you still are." }
     ],
     ta: [
-        { title: "என் முஹ்-விடம்", date: "ஜனவரி 22, 2021", text: "முதல் நாளிலேயே நீ வித்தியாசமானவள் என்று எனக்குத் தெரியும். உன் கருணையும், உன் பிடிவாதமும் (என்னுடையதைப் போலவே) நாம் ஒருவருக்கொருவர் படைக்கப்பட்டவர்கள் என்பதை உணரச் செய்தது." },
-        { title: "துபாய் குறிப்பு", date: "2023 பிரதிபலிப்பு", text: "துபாயில் ஒவ்வொரு காலையும், வெப்பத்தையும் தூரத்தையும் பொருட்படுத்தாமல், நான் ஒரு சிந்தனையுடன் கணிக்கிறேன்: நமது எதிர்காலத்திற்காக நான் உழைக்கிறேன். நீ என் நட்சத்திரம்." },
+        { title: "என் முஹ்-விடம்", date: "ஜனவரி 22, 2021", text: "முதல் நாளிலேயே நீ வித்தியாசமானவள் என்று எனக்குத் தெரியும். உன் கருணையும், உன் பிடிவாதமும்—என்னுடையதைப் போலவே—நீ எவ்வளவு அரிதானவள் என்பதை உணரச் செய்தது. அந்த 5 ஆண்டுகள் இன்னும் முடியாத ஒரு காதலின் தொடக்கம் மட்டுமே." },
+        { title: "துபாய் குறிப்பு", date: "2023 பிரதிபலிப்பு", text: "துபாயில் ஒவ்வொரு காலையும், வெப்பத்தையும் தூரத்தையும் பொருட்படுத்தாமல், நான் உன்னை நினைத்தே எழுகிறேன். நீ என் நட்சத்திரம், என்னை வீட்டிற்கு வழிநடத்துகிறாய்." },
         { title: "கல்லூரி நாட்கள்", date: "லயோலா நினைவு", text: "உன் பேருந்தைத் துரத்திய அதிர்வுகள் இன்னும் எனக்கு ஞாபகம் இருக்கிறது. அந்த 1000/100 ஈகோ? உன் அழகான புன்னகைக்கு முன்னால் அதற்கு ஒரு வாய்ப்பும் இல்லை." },
-        { title: "இரத்தக் கலை", date: "உணர்ச்சிப்பூர்வமான ஆன்மா", text: "நான் உனக்குக் கொடுத்த அந்தக் கலைப்படைப்பு... அது வெறும் காகிதத்தில் உள்ள வண்ணங்கள் அல்ல. அது என் இதயத்துடிப்பு, என் ஆன்மா, நீ எனக்கு எவ்வளவு அர்த்தம் என்பதை உனக்குக் காட்டும் என் ஆழமான பகுதிகள்." },
-        { title: "சத்தியம்", date: "என்றென்றும்", text: "என் கடைசி மூச்சு வரை நான் உன்னுடன் இருக்க வேண்டும். நீயே என் முதல் முன்னுரிமை—குறைந்த முன்னுரிமை அல்ல, ஒருபோதும் அல்ல. நான் எனக்காக எதையும் செய்யவில்லை, நமக்காகச் செய்கிறேன். நீயே என் உலகம்." }
+        { title: "இரத்தக் கலை", date: "உணர்ச்சிப்பூர்வமான ஆன்மா", text: "நான் உனக்குக் கொடுத்த அந்தக் கலைப்படைப்பு... அது வெறும் காகிதத்தில் உள்ள வண்ணங்கள் அல்ல. அது என் இதயத்துடிப்பு, என் ஆன்மா, நீ எனக்கு எவ்வளவு அர்த்தமாக இருக்கிறாய் என்பதைக் காட்டும் என் ஆழமான பகுதிகள். இது என்றென்றும் நம்முடையதாகவே இருக்கும் ஒரு பிணைப்பு." },
+        { title: "சத்தியம்", date: "என்றென்றும்", text: "நீ இருக்கிறாய், இன்னும் இருப்பாய், என் உண்மையான முன்னுரிமைகளில் ஒருவளாக—ஒருபோதும் குறைந்தவளாக இல்லை. நான் செய்த சிலவற்றை நமக்காகவே செய்தேன், இன்னும் அவை ஒவ்வொன்றையும் நான் நம்புகிறேன். நீயே என் உலகமாக இருந்தாய், இன்னும் இருக்கிறாய்." }
     ]
 };
 
@@ -31,18 +31,42 @@ export default function LettersPage() {
     const { lang } = useAppContext();
     const router = useRouter();
     const [openLetter, setOpenLetter] = useState<number | null>(null);
+    const [favorited, setFavorited] = useState<number[]>([]);
+    const openedTitlesRef = useRef<string[]>([]);
 
     useEffect(() => {
         logInsight('lastPage', 'Letters from the Heart');
     }, []);
 
+    // Reports which envelopes were opened and which were favorited, tagged to
+    // THIS page on leave.
+    useOnRealUnmount(() => {
+        if (openedTitlesRef.current.length > 0 || favorited.length > 0) {
+            sendTrackBeacon({
+                path: '/story/letters',
+                event: 'letters_leave',
+                lettersOpened: openedTitlesRef.current.join('; '),
+                lettersFavorited: favorited.map(i => lettersData[lang][i].title).join('; '),
+            });
+        }
+    });
+
     const handleOpenLetter = (index: number) => {
         if (openLetter !== index) {
             setOpenLetter(index);
             logInsight('hugCount', 1); // Opening a letter is an affection point
+            const title = lettersData[lang][index].title;
+            if (!openedTitlesRef.current.includes(title)) {
+                openedTitlesRef.current.push(title);
+            }
         } else {
             setOpenLetter(null);
         }
+    };
+
+    const toggleFavorite = (index: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setFavorited(prev => prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]);
     };
 
     return (
@@ -72,7 +96,16 @@ export default function LettersPage() {
                                         <p className="text-[10px] uppercase tracking-widest opacity-40">{letter.date}</p>
                                     </div>
                                 </div>
-                                <Heart size={20} className={`text-romantic-red transition-all duration-500 ${openLetter === i ? 'fill-current scale-125' : 'opacity-20'}`} />
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={(e) => toggleFavorite(i, e)}
+                                        aria-label="Favorite this letter"
+                                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                                    >
+                                        <Star size={18} className={favorited.includes(i) ? 'text-romantic-gold fill-current' : 'text-foreground/20'} />
+                                    </button>
+                                    <Heart size={20} className={`text-romantic-red transition-all duration-500 ${openLetter === i ? 'fill-current scale-125' : 'opacity-20'}`} />
+                                </div>
                             </motion.div>
 
                             <AnimatePresence>
@@ -84,7 +117,7 @@ export default function LettersPage() {
                                         transition={{ type: "spring", damping: 20, stiffness: 100 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="mt-4 glass-card p-10 md:p-14 rounded-3xl border-white/20 bg-white/5 mx-2 text-left shadow-2xl relative overflow-hidden">
+                                        <div className="mt-4 glass-card p-5 md:p-14 rounded-3xl border-white/20 bg-white/5 mx-2 text-left shadow-2xl relative overflow-hidden">
                                             {/* Paper Texture Overlay */}
                                             <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/paper-fibers.png")' }} />
 
@@ -93,7 +126,7 @@ export default function LettersPage() {
                                                 <Heart size={40} className="fill-current" />
                                             </div>
 
-                                            <p className={`text-lg md:text-xl leading-relaxed text-foreground/90 font-serif mb-8 border-l-4 border-romantic-red/20 pl-6 ${lang === 'ta' ? 'font-tamil' : ''}`}>
+                                            <p className={`text-lg md:text-xl leading-relaxed text-foreground/90 font-serif mb-8 border-l-4 border-romantic-red/20 pl-4 md:pl-6 ${lang === 'ta' ? 'font-tamil' : ''}`}>
                                                 {letter.text}
                                             </p>
 
@@ -120,7 +153,7 @@ export default function LettersPage() {
                     className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
                 >
                     <span>{content[lang].cta_letters}</span>
-                    <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                    <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform duration-500" />
                 </motion.button>
             </StoryCard>
         </CinematicContainer>

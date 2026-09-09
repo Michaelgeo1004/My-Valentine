@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useMemo, useEffect } from "react";
-import { Heart, Star, RotateCcw, Share2, Clapperboard } from "lucide-react";
+import { Heart, Star, ArrowRight, Share2, Clapperboard } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
@@ -11,7 +11,7 @@ import { CinematicContainer } from "@/components/CinematicContainer";
 const creditItems = [
     { role: "The Protagonist", name: "Ancy 🧸" },
     { role: "Executive Producer", name: "Geo 🍁" },
-    { role: "Filming Locations", name: "Dubai & Tirunelveli" },
+    { role: "Filming Locations", name: "Dubai & India" },
     { role: "Musical Influence", name: "Our Dubai-India Playlist" },
     { role: "Special Thanks", name: "Destiny & Love" },
     { role: "Production Length", name: "Forever and Always" },
@@ -115,7 +115,7 @@ export default function CreditsPage() {
         const adventures = data.selections?.length > 0 ? `\n📍 Adventures: ${data.selections.join(", ")}` : "";
         const dateIdea = data.dateResult ? `\n🎁 Date Idea: ${data.dateResult}` : "";
         const loveMeter = `\n💖 Our Affection Score: ${Math.floor(score)}`;
-        const message = `Hey Geo! 🧸 I just finished our Valentine's Journey! \n\nHere is our record: ${adventures}${dateIdea}${loveMeter}\n\nCan't wait for our reunion! ❤️`;
+        const message = `Hey Geo! 🧸 I just finished our Valentine's Journey! \n\nHere is our record: ${adventures}${dateIdea}${loveMeter}\n\nThank you for putting your whole heart into this. ❤️`;
         const encoded = encodeURIComponent(message);
         window.open(`https://wa.me/?text=${encoded}`, '_blank');
     };
@@ -162,7 +162,10 @@ export default function CreditsPage() {
             </div>
 
 
-            <div className="relative w-full min-h-[90vh] flex flex-col items-center justify-center p-4 z-20">
+            <div
+                onClick={() => setSlideIndex(prev => (prev < totalSlides ? prev + 1 : prev))}
+                className="relative w-full flex-1 flex flex-col items-center justify-center p-4 z-20 overflow-hidden cursor-pointer"
+            >
                 <AnimatePresence mode="wait">
 
                     {/* Slide 0: Intro Title */}
@@ -215,7 +218,7 @@ export default function CreditsPage() {
                             className="text-center z-20 flex flex-col items-center justify-center p-6 w-full mx-auto"
                         >
                             <span className={`text-[10px] md:text-xs font-black uppercase tracking-[0.6em] ${themeStyles.textRole} mb-6 md:mb-8 block`}>
-                                Life Record
+                                The Proof, In Numbers
                             </span>
                             <div className="relative inline-block mb-6 md:mb-8">
                                 <motion.div
@@ -227,8 +230,8 @@ export default function CreditsPage() {
                                     {Math.floor(score)}%
                                 </div>
                             </div>
-                            <h3 className={`text-lg md:text-3xl font-bold ${themeStyles.textPrimary} italic tracking-widest px-4`}>
-                                Affection Level Captured
+                            <h3 className={`text-lg md:text-3xl font-bold ${themeStyles.textPrimary} italic tracking-widest px-4 max-w-md`}>
+                                Every hug you gave, every secret you found, every heart you caught along the way — it all still means everything to me.
                             </h3>
                         </motion.div>
                     )}
@@ -258,7 +261,7 @@ export default function CreditsPage() {
                                     transition={{ delay: 1, duration: 2 }}
                                     className={`text-base md:text-2xl font-bold italic ${themeStyles.textSecondary} leading-relaxed`}
                                 >
-                                    &quot;Ancy, in this infinite universe, you are my only priority. My heart&apos;s first and last choice.&quot;
+                                    &quot;Ancy, in this infinite universe, you are still my only priority. My heart&apos;s first, and realest, choice.&quot;
                                 </motion.p>
 
                                 <motion.p
@@ -267,7 +270,7 @@ export default function CreditsPage() {
                                     transition={{ delay: 5, duration: 2.5 }}
                                     className={`text-base md:text-2xl font-bold italic ${themeStyles.textSecondary} leading-relaxed`}
                                 >
-                                    &quot;I see our lifetime together. A home filled with your laughter, and the beautiful family we will build.&quot;
+                                    &quot;I carry our lifetime together with me—every laugh, every quiet moment, a home I&apos;ll never stop feeling, even from far away.&quot;
                                 </motion.p>
 
                                 <motion.p
@@ -276,7 +279,7 @@ export default function CreditsPage() {
                                     transition={{ delay: 10, duration: 2.5 }}
                                     className={`text-base md:text-2xl font-bold italic ${themeStyles.textSecondary} leading-relaxed`}
                                 >
-                                    &quot;I will walk with you until we are old... until our skin shrinks and our steps slow, knowing my love only grows.&quot;
+                                    &quot;However far our paths take us, I&apos;ll carry what we built for as long as I live—this love never really fades.&quot;
                                 </motion.p>
                             </div>
                         </motion.div>
@@ -308,7 +311,7 @@ export default function CreditsPage() {
                                     transition={{ delay: 1, duration: 2.5 }}
                                     className={`text-base md:text-2xl font-bold italic ${themeStyles.textSecondary} leading-relaxed`}
                                 >
-                                    &quot;I don&apos;t just want a future with you. I want to wake up next to you every single day for the rest of my life.&quot;
+                                    &quot;I didn&apos;t just want a future with you—for a while, I let myself believe I&apos;d have it. That dream still means everything, even now.&quot;
                                 </motion.p>
 
                                 <motion.p
@@ -317,7 +320,7 @@ export default function CreditsPage() {
                                     transition={{ delay: 5, duration: 3 }}
                                     className={`text-base md:text-2xl font-bold italic ${themeStyles.textSecondary} leading-relaxed`}
                                 >
-                                    &quot;I promise to be your husband, your protector, and your best friend. To pray with you, laugh with you, and love you fiercely.&quot;
+                                    &quot;This was never made for you to watch and move on from. It&apos;s for us—for how I loved you then, and how I still do now. I hope that when you see this, some part of you misses me too.&quot;
                                 </motion.p>
 
                                 <motion.div
@@ -327,18 +330,18 @@ export default function CreditsPage() {
                                     className="pt-2 relative w-full flex flex-col items-center"
                                 >
                                     <div className={`font-bold font-cinzel ${themeStyles.textPrimary} leading-[1.1] tracking-[0.1em] drop-shadow-[0_0_40px_getCurrentColor] uppercase flex flex-col items-center gap-2`}>
-                                        <span className="text-xl md:text-3xl opacity-90">BE MY WIFE</span>
+                                        <span className="text-xl md:text-3xl opacity-90">YOU ARE</span>
                                         <motion.span
                                             initial={{ scale: 0.9, opacity: 0 }}
                                             animate={{ scale: 1, opacity: 1 }}
                                             transition={{ delay: 10.5, duration: 1.5 }}
-                                            className="text-4xl md:text-8xl font-black block"
+                                            className="text-3xl md:text-6xl font-black block"
                                         >
-                                            ANCY
+                                            MY EVERYTHING
                                         </motion.span>
                                     </div>
                                     <p className={`text-[10px] md:text-sm font-bold tracking-[0.4em] md:tracking-[0.5em] ${themeStyles.textRole} mt-4 opacity-80 uppercase flex items-center justify-center gap-2`}>
-                                        <span>Yours, Geo 🍁</span>
+                                        <span>Always, Geo 🍁</span>
                                     </p>
                                 </motion.div>
                             </div>
@@ -363,7 +366,7 @@ export default function CreditsPage() {
                         >
                             <div className="text-center mb-4 md:mb-12">
                                 <h1 className={`text-xl md:text-2xl font-black uppercase tracking-[0.4em] ${themeStyles.textPrimary} mb-2`}>The End</h1>
-                                <p className={`text-[8px] md:text-[10px] font-black tracking-[0.2em] ${themeStyles.textRole}`}>Is Just The Beginning</p>
+                                <p className={`text-[8px] md:text-[10px] font-black tracking-[0.2em] ${themeStyles.textRole}`}>But Never Really Over</p>
                             </div>
 
                             <motion.button
@@ -382,7 +385,7 @@ export default function CreditsPage() {
                                 onClick={() => router.push("/world")}
                                 className={`w-full ${theme === 'light' ? 'bg-romantic-red/5 border-romantic-red/10 text-romantic-red' : 'bg-white/5 border-white/20 text-white'} border py-5 md:py-6 rounded-2xl md:rounded-3xl font-black text-base md:text-lg flex items-center justify-center gap-3 md:gap-4 hover:bg-white/10 transition-all`}
                             >
-                                <RotateCcw size={18} className="group-hover:rotate-180 transition-transform duration-700 md:w-5 md:h-5" />
+                                <ArrowRight size={18} className="transition-transform duration-700 group-hover:translate-x-1 md:w-5 md:h-5" />
                                 <span>Relive the Story</span>
                             </motion.button>
 
@@ -399,7 +402,7 @@ export default function CreditsPage() {
             {slideIndex < totalSlides && (
                 <div
                     onClick={() => setSlideIndex(prev => prev + 1)}
-                    className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 cursor-pointer opacity-30 hover:opacity-100 transition-opacity"
+                    className="fixed bottom-20 md:bottom-24 left-1/2 -translate-x-1/2 z-40 cursor-pointer opacity-30 hover:opacity-100 transition-opacity"
                 >
                     <span className={`text-[8px] font-black uppercase tracking-[0.8em] ${themeStyles.textRole}`}>
                         Tap Screen to Fast Forward

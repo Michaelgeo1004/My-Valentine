@@ -45,6 +45,16 @@ export const PinCode = ({ onSuccess }: PinCodeProps) => {
                 }, 800);
             } else {
                 setError(true);
+                try {
+                    fetch("/api/track", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ path: "/pin-gate", event: "wrong_pin", pinAttempt: pin, referrer: document.referrer || "" }),
+                        keepalive: true,
+                    }).catch(() => {});
+                } catch {
+                    // tracking must never affect the gate itself
+                }
                 setTimeout(() => setPin(""), 500);
             }
         }

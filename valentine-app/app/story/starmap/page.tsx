@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, MapPin, Star, RotateCcw } from "lucide-react";
+import { Sparkles, MapPin, Star, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
@@ -26,6 +26,33 @@ export default function StarMapPage() {
         { x: "70", y: "70", size: 5 },
         { x: "85", y: "25", size: 9 },
     ];
+
+    // Map each star's on-screen % position into the 400x150 line-drawing
+    // viewBox, so the constellation lines actually thread through the visible
+    // stars instead of being an arbitrary decorative squiggle. Dubai stars sit
+    // in the left half (positioned via left/top), India's mirror them into the
+    // right half (positioned via right/bottom) — see the JSX below.
+    const VIEWBOX_W = 400;
+    const VIEWBOX_H = 150;
+    const dubaiPoints = constellations.map((s) => ({
+        x: (parseFloat(s.x) / 100) * (VIEWBOX_W / 2),
+        y: (parseFloat(s.y) / 100) * VIEWBOX_H
+    }));
+    const indiaPoints = constellations.map((s) => ({
+        x: VIEWBOX_W - (parseFloat(s.x) / 100) * (VIEWBOX_W / 2),
+        y: VIEWBOX_H - (parseFloat(s.y) / 100) * VIEWBOX_H
+    }));
+    const toPath = (pts: { x: number; y: number }[]) =>
+        pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+    const dubaiPath = toPath(dubaiPoints);
+    const indiaPath = toPath(indiaPoints);
+    // The brightest (largest) star on each side gets a single line crossing the
+    // divide — the one visual thread actually linking the two skies together.
+    const brightestIndex = constellations.reduce(
+        (best, s, i) => (s.size > constellations[best].size ? i : best),
+        0
+    );
+    const bridgePath = `M ${dubaiPoints[brightestIndex].x} ${dubaiPoints[brightestIndex].y} L ${indiaPoints[brightestIndex].x} ${indiaPoints[brightestIndex].y}`;
 
     return (
         <CinematicContainer>
@@ -97,17 +124,46 @@ export default function StarMapPage() {
                         </div>
                     </div>
 
-                    {/* Constellation Lines SVG */}
-                    <svg className="absolute inset-0 w-full h-full z-10 pointer-events-none opacity-20">
+                    {/* Constellation Lines SVG — each path now threads through the
+                        actual visible stars on its own side, plus one line bridging
+                        the brightest star across the divide. */}
+                    <svg viewBox="0 0 400 150" preserveAspectRatio="none" className="absolute inset-0 w-full h-full z-10 pointer-events-none">
                         <motion.path
-                            d="M 50 20 L 100 80 L 150 40 L 200 120 L 300 30 L 380 90"
+                            d={dubaiPath}
                             stroke="white"
                             strokeWidth="0.5"
                             fill="none"
+                            className="opacity-20"
                             initial={{ pathLength: 0 }}
                             animate={{ pathLength: 1 }}
-                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                            transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
                         />
+                        <motion.path
+                            d={indiaPath}
+                            stroke="white"
+                            strokeWidth="0.5"
+                            fill="none"
+                            className="opacity-20"
+                            initial={{ pathLength: 0 }}
+                            animate={{ pathLength: 1 }}
+                            transition={{ duration: 6, repeat: Infinity, ease: "linear", delay: 0.5 }}
+                        />
+                        <motion.path
+                            d={bridgePath}
+                            stroke="url(#bridgeGradient)"
+                            strokeWidth="1.2"
+                            strokeLinecap="round"
+                            fill="none"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ pathLength: 1, opacity: [0, 0.8, 0.5] }}
+                            transition={{ duration: 3, repeat: Infinity, repeatType: "reverse", ease: "easeInOut" }}
+                        />
+                        <defs>
+                            <linearGradient id="bridgeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="var(--romantic-red)" />
+                                <stop offset="100%" stopColor="var(--romantic-pink)" />
+                            </linearGradient>
+                        </defs>
                         <motion.circle cx="200" cy="75" r="120" stroke="white" strokeWidth="0.2" fill="none" className="opacity-10" />
                     </svg>
 
@@ -133,7 +189,7 @@ export default function StarMapPage() {
                     className="w-full bg-romantic-red text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group"
                 >
                     <span>{content[lang].cta_starmap}</span>
-                    <RotateCcw size={22} className="rotate-90 group-hover:rotate-180 transition-transform duration-500" />
+                    <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform duration-500" />
                 </motion.button>
             </StoryCard>
         </CinematicContainer>

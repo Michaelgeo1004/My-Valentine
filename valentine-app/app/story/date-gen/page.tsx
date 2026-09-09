@@ -1,15 +1,15 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { Coffee, Film, Music, Utensils, Sparkles, RotateCcw, Heart, LucideIcon } from "lucide-react";
+import { useRef, useState } from "react";
+import { FlaskConical, Moon, BookOpen, Sparkles, ArrowRight, Heart, LucideIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAppContext } from "@/context/AppContext";
 import { content } from "@/constants/content";
 import { CinematicContainer } from "@/components/CinematicContainer";
 import { StoryCard } from "@/components/StoryCard";
-import { logInsight } from "@/utils/insights";
+import { logInsight, sendTrackBeacon, useOnRealUnmount } from "@/utils/insights";
 
 interface DateIdea {
     text: string;
@@ -18,18 +18,18 @@ interface DateIdea {
 
 const dateIdeas: Record<string, DateIdea[]> = {
     en: [
-        { text: "Virtual Movie Night & Popcorn 🍿", icon: Film },
-        { text: "Late Night Video Call Coffee Date ☕", icon: Coffee },
-        { text: "Sync-listening to Our Favorite Album 🎵", icon: Music },
-        { text: "Cooking the Same Recipe Together 🥘", icon: Utensils },
-        { text: "Planning Our Next Reunion Trip ✈️", icon: Sparkles },
+        { text: "Where It All Began, In a Lab 🔬", icon: FlaskConical },
+        { text: "Her Shoulder, My Peace 🌙", icon: Moon },
+        { text: "The First Kiss, At Midnight ✨", icon: Sparkles },
+        { text: "A Quiet Reverence, In the Library 📖", icon: BookOpen },
+        { text: "The Ring, At a Bus Stand 💍", icon: Heart },
     ],
     ta: [
-        { text: "மெய்நிகர் திரைப்பட இரவு & பாப்கார்ன் 🍿", icon: Film },
-        { text: "இரவு நேர வீடியோ கால் காபி தேதி ☕", icon: Coffee },
-        { text: "நமக்கு பிடித்த ஆல்பத்தை ஒன்றாக கேட்பது 🎵", icon: Music },
-        { text: "ஒரே செய்முறையை ஒன்றாக சமைப்பது 🥘", icon: Utensils },
-        { text: "நமது அடுத்த சந்திப்பு பயணத்தைத் திட்டமிடுவது ✈️", icon: Sparkles },
+        { text: "எல்லாம் தொடங்கிய நாள், ஒரு ஆய்வகத்தில் 🔬", icon: FlaskConical },
+        { text: "அவள் தோளில், என் அமைதி 🌙", icon: Moon },
+        { text: "முதல் முத்தம், நள்ளிரவில் ✨", icon: Sparkles },
+        { text: "ஒரு அமைதியான பணிவு, நூலகத்தில் 📖", icon: BookOpen },
+        { text: "மோதிரம், பேருந்து நிலையத்தில் 💍", icon: Heart },
     ]
 };
 
@@ -38,10 +38,19 @@ export default function DateGenPage() {
     const router = useRouter();
     const [rouletteIndex, setRouletteIndex] = useState(0);
     const [status, setStatus] = useState<"idle" | "spinning" | "winner">("idle");
+    const finalResultRef = useRef<string | null>(null);
 
     useEffect(() => {
-        logInsight('lastPage', 'Date Generator');
+        logInsight('lastPage', 'Memory Roulette');
     }, []);
+
+    // Reports the winning date idea tagged to THIS page on leave, instead of
+    // letting it echo on every future row via the generic cross-page snapshot.
+    useOnRealUnmount(() => {
+        if (finalResultRef.current) {
+            sendTrackBeacon({ path: '/story/date-gen', event: 'dategen_leave', dateResult: finalResultRef.current });
+        }
+    });
 
     const startRoulette = () => {
         setStatus("spinning");
@@ -55,7 +64,9 @@ export default function DateGenPage() {
             if (cycles >= maxCycles) {
                 clearInterval(interval);
                 setStatus("winner");
-                logInsight('dateResult', dateIdeas[lang][(rouletteIndex + cycles) % dateIdeas[lang].length].text);
+                const result = dateIdeas[lang][(rouletteIndex + cycles) % dateIdeas[lang].length].text;
+                finalResultRef.current = result;
+                logInsight('dateResult', result);
             }
         }, 100);
     };
@@ -64,7 +75,7 @@ export default function DateGenPage() {
 
     return (
         <CinematicContainer>
-            <StoryCard className="max-w-2xl min-h-[600px] flex flex-col justify-between">
+            <StoryCard className="max-w-2xl flex flex-col justify-between">
                 <div className="w-full">
                     <h1 className="text-3xl md:text-5xl font-black mb-2 text-romantic text-center">
                         {content[lang].date_title}
@@ -74,7 +85,7 @@ export default function DateGenPage() {
                     </p>
                 </div>
 
-                <div className="relative h-80 w-full flex items-center justify-center mb-12">
+                <div className="relative h-64 md:h-80 w-full flex items-center justify-center mb-12">
                     <AnimatePresence mode="wait">
                         {status === "idle" ? (
                             <motion.div
@@ -84,7 +95,7 @@ export default function DateGenPage() {
                                 className="flex flex-col items-center opacity-20 group cursor-pointer"
                                 onClick={startRoulette}
                             >
-                                <Utensils size={120} className="group-hover:scale-110 transition-transform" />
+                                <Heart size={120} className="group-hover:scale-110 transition-transform" />
                                 <span className="mt-4 text-[10px] font-black uppercase tracking-[0.4em]">Tap to Start Roulette</span>
                             </motion.div>
                         ) : (
@@ -146,7 +157,7 @@ export default function DateGenPage() {
                         className="w-full bg-romantic-pink text-white py-5 rounded-3xl font-black text-xl shadow-xl flex items-center justify-center gap-4 group disabled:opacity-50"
                     >
                         <Heart size={24} className={status === "spinning" ? "animate-ping" : "group-hover:scale-125 transition-transform"} />
-                        <span>{status === "winner" ? (lang === 'ta' ? 'மீண்டும் சுழற்று' : 'Spin Again') : (lang === 'ta' ? 'தேதியைத் திட்டமிடுங்கள்' : 'Plan Our Date')}</span>
+                        <span>{status === "winner" ? (lang === 'ta' ? 'மீண்டும் சுழற்று' : 'Spin Again') : (lang === 'ta' ? 'ஒரு நினைவைத் தேடுங்கள்' : 'Find a Memory')}</span>
                     </motion.button>
 
                     <motion.button
@@ -155,7 +166,7 @@ export default function DateGenPage() {
                         className="w-full glass-card py-5 rounded-3xl font-black text-romantic-red flex items-center justify-center gap-4 hover:bg-white/5 transition-all"
                     >
                         <span>{content[lang].cta_dategen}</span>
-                        <RotateCcw size={20} className="rotate-90" />
+                        <ArrowRight size={20} />
                     </motion.button>
                 </div>
             </StoryCard>

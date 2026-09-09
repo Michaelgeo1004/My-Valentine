@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { AppContextProvider } from "@/context/AppContext";
 import { PinCode } from "@/components/PinCode";
+import { TapHearts } from "@/components/TapHearts";
+import { CursorTrail } from "@/components/CursorTrail";
+import { GlobalControls } from "@/components/GlobalControls";
+import { GlobalFooter } from "@/components/GlobalFooter";
 
 export default function ClientLayout({
     children,
@@ -40,6 +44,10 @@ export default function ClientLayout({
                         children
                     )}
                 </main>
+                {mounted && unlocked && <TapHearts />}
+                {mounted && unlocked && <CursorTrail />}
+                {mounted && unlocked && <GlobalControls />}
+                {mounted && unlocked && <GlobalFooter />}
             </div>
         </AppContextProvider>
     );

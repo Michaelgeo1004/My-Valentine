@@ -44,31 +44,31 @@ export default function LoyolaPage() {
 
                     <motion.div
                         initial={{ x: -150, opacity: 0 }}
-                        animate={{ x: -40, opacity: 1 }}
+                        animate={{ x: -20, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 100, delay: 0.8 }}
                         className="flex flex-col items-center"
                     >
-                        <span className="text-5xl md:text-8xl font-black text-romantic-red drop-shadow-lg">1000</span>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Driver's Ego</span>
+                        <span className="text-4xl md:text-8xl font-black text-romantic-red drop-shadow-lg">1000</span>
+                        <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest opacity-40">Driver's Ego</span>
                     </motion.div>
 
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: [0, 1.5, 1] }}
                         transition={{ delay: 1.2, duration: 0.5 }}
-                        className="text-3xl md:text-5xl font-black text-foreground/20 px-4 md:px-8 z-10"
+                        className="text-2xl md:text-5xl font-black text-foreground/20 px-1.5 md:px-8 z-10"
                     >
                         VS
                     </motion.div>
 
                     <motion.div
                         initial={{ x: 150, opacity: 0 }}
-                        animate={{ x: 40, opacity: 1 }}
+                        animate={{ x: 20, opacity: 1 }}
                         transition={{ type: "spring", stiffness: 100, delay: 1 }}
                         className="flex flex-col items-center"
                     >
-                        <span className="text-5xl md:text-8xl font-black text-romantic-pink drop-shadow-lg">100</span>
-                        <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Ancy's Ego</span>
+                        <span className="text-4xl md:text-8xl font-black text-romantic-pink drop-shadow-lg">100</span>
+                        <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest opacity-40">Ancy's Ego</span>
                     </motion.div>
 
                     <motion.div

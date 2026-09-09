@@ -27,12 +27,12 @@ export default function MoreMemoriesPage() {
                 </div>
 
                 <h2 className="text-3xl md:text-5xl font-black mb-6 text-romantic">
-                    {lang === 'ta' ? 'இன்னும் பல நினைவுகள் விரைவில்...' : 'More Memories Coming Soon...'}
+                    {lang === 'ta' ? 'ஒவ்வொரு நினைவும், பாதுகாக்கப்பட்டது' : 'Every Memory, Kept'}
                 </h2>
                 <p className="text-lg opacity-60 italic mb-12">
                     {lang === 'ta'
-                        ? 'நமது 5 ஆண்டு பயணத்தின் இன்னும் பல அழகிய தருணங்களை இங்கே சேர்ப்போம்.'
-                        : "We'll be adding many more beautiful moments from our 5-year journey here soon."}
+                        ? 'நமது 5 ஆண்டு பயணத்திலிருந்து நான் வைத்திருக்க தேர்ந்தெடுத்த அனைத்தும் இதுதான்—ஒவ்வொன்றும் இன்னும் எனக்கு மிக முக்கியமானது.'
+                        : "This is everything I chose to hold onto from our 5-year journey—every one of them still means the world to me."}
                 </p>
 
                 <div className="flex flex-col gap-4">
