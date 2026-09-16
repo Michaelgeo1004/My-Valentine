@@ -82,16 +82,6 @@ export default function ReasonsDeckPage() {
                     <p className="text-sm md:text-base font-medium opacity-60 italic mb-4">
                         {content[lang].reasons_desc}
                     </p>
-                    {/* TEMP dev shortcut to skip ahead to the next page while this page's
-                        design is still being iterated on — remove once finalized. */}
-                    <div className="flex justify-center gap-2 mb-8">
-                        <button
-                            onClick={() => router.push("/story/garden")}
-                            className="text-[10px] font-black uppercase tracking-widest bg-romantic-red/10 text-romantic-red px-3 py-1 rounded-full border border-romantic-red/20 active:scale-95 transition-transform"
-                        >
-                            Next Page (temp)
-                        </button>
-                    </div>
                 </div>
 
                 {/* Card Stack Container */}
